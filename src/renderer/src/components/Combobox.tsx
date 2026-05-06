@@ -17,7 +17,8 @@ export function Combobox({
   groups,
   placeholder = 'Select…',
   disabled = false,
-  searchPlaceholder
+  searchPlaceholder,
+  onDeleteItem
 }: {
   value: string
   onChange: (v: string) => void
@@ -73,6 +74,7 @@ export function Combobox({
   // Reset query + active index when opening
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('')
       setActiveIdx(0)
       // Focus search input on next frame so the open animation doesn't fight focus
@@ -82,6 +84,7 @@ export function Combobox({
 
   // Keep activeIdx valid when filter narrows
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (activeIdx >= totalMatches) setActiveIdx(Math.max(0, totalMatches - 1))
   }, [totalMatches, activeIdx])
 
@@ -108,9 +111,7 @@ export function Combobox({
   // Scroll active item into view
   useEffect(() => {
     if (!open || !listRef.current) return
-    const el = listRef.current.querySelector<HTMLButtonElement>(
-      `[data-cb-idx="${activeIdx}"]`
-    )
+    const el = listRef.current.querySelector<HTMLButtonElement>(`[data-cb-idx="${activeIdx}"]`)
     if (el) el.scrollIntoView({ block: 'nearest' })
   }, [activeIdx, open])
 
@@ -141,7 +142,9 @@ export function Combobox({
           transition: 'border-color 0.15s ease'
         }}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+        <span
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}
+        >
           {selected ? (
             <>
               <span style={{ fontWeight: 500 }}>{selected.label}</span>
@@ -295,9 +298,10 @@ export function Combobox({
                           justifyContent: 'space-between',
                           gap: '8px',
                           color: isSelected ? '#60a5fa' : '#ccc',
-                          fontFamily: 'inherit',
-                          group: 'option'
+                          fontFamily: 'inherit'
                         }}
+                        role="option"
+                        aria-selected={isSelected}
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div
@@ -309,11 +313,27 @@ export function Combobox({
                               gap: '6px'
                             }}
                           >
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span
+                              style={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
                               {item.label}
                             </span>
                             {isSelected && (
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <svg
+                                width="10"
+                                height="10"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{ flexShrink: 0 }}
+                              >
                                 <polyline points="20 6 9 17 4 12" />
                               </svg>
                             )}
@@ -354,11 +374,27 @@ export function Combobox({
                               alignItems: 'center',
                               justifyContent: 'center'
                             }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = '#444'; e.currentTarget.style.backgroundColor = 'transparent' }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = '#ef4444'
+                              e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = '#444'
+                              e.currentTarget.style.backgroundColor = 'transparent'
+                            }}
                           >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <line x1="18" y1="6" x2="6" y2="18" />
+                              <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
                           </button>
                         )}

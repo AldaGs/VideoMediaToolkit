@@ -23,7 +23,8 @@ body {
 }
 
 code {
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   font-size: 85%;
 }
 
@@ -33,45 +34,92 @@ code {
 }
 
 /* ── Scrollbars ─────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #3c3c3c; }
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3c3c3c;
+}
 
 /* ── Keyframe animations ────────────────────────────── */
 @keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateX(-50%) translateY(14px); opacity: 0; }
-  to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+  from {
+    transform: translateX(-50%) translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.97) translateY(4px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1;    }
-  50%       { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Form element font inherit ──────────────────────── */
-button, select, input { font-family: inherit; }
+button,
+select,
+input {
+  font-family: inherit;
+}
 
-input[type='range']    { accent-color: #3b82f6; cursor: pointer; }
-input[type='checkbox'] { accent-color: #3b82f6; width: 14px; height: 14px; cursor: pointer; }
+input[type='range'] {
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+input[type='checkbox'] {
+  accent-color: #3b82f6;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
 
 /* ── Import button ──────────────────────────────────── */
 .btn-import {
-  transition: filter 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+  transition:
+    filter 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease !important;
 }
 .btn-import:hover {
   filter: brightness(1.14) !important;
@@ -83,7 +131,9 @@ input[type='checkbox'] { accent-color: #3b82f6; width: 14px; height: 14px; curso
 }
 
 /* ── Process button ─────────────────────────────────── */
-.btn-process { transition: all 0.2s ease !important; }
+.btn-process {
+  transition: all 0.2s ease !important;
+}
 .btn-process.ready:hover {
   filter: brightness(1.1) !important;
   transform: translateY(-1px) !important;
@@ -94,7 +144,9 @@ input[type='checkbox'] { accent-color: #3b82f6; width: 14px; height: 14px; curso
 
 /* ── Queue items ────────────────────────────────────── */
 .queue-item {
-  transition: background-color 0.12s ease, border-color 0.12s ease !important;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease !important;
 }
 .queue-item:hover {
   background-color: rgba(255, 255, 255, 0.04) !important;
@@ -102,17 +154,23 @@ input[type='checkbox'] { accent-color: #3b82f6; width: 14px; height: 14px; curso
 }
 
 /* ── Mini / toggle buttons ──────────────────────────── */
-.mini-btn { transition: all 0.15s ease !important; }
+.mini-btn {
+  transition: all 0.15s ease !important;
+}
 .mini-btn:hover:not(:disabled) {
   filter: brightness(1.2) !important;
   border-color: #555 !important;
 }
-.mini-btn:active:not(:disabled) { transform: scale(0.96) !important; }
+.mini-btn:active:not(:disabled) {
+  transform: scale(0.96) !important;
+}
 
 /* ── Styled select & input ──────────────────────────── */
 .styled-select,
 .styled-input {
-  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease !important;
 }
 .styled-select:hover,
 .styled-input:hover {
@@ -133,26 +191,42 @@ input[type='checkbox'] { accent-color: #3b82f6; width: 14px; height: 14px; curso
 }
 
 /* ── Toast notification ─────────────────────────────── */
-.toast-animated { animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast-animated {
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 /* ── Done / processing cards ────────────────────────── */
-.done-card { animation: fadeInScale 0.25s ease; }
+.done-card {
+  animation: fadeInScale 0.25s ease;
+}
 
 /* ── Action buttons (Show in Folder, Export As) ─────── */
-.action-btn { transition: all 0.18s ease !important; }
+.action-btn {
+  transition: all 0.18s ease !important;
+}
 .action-btn:hover {
   filter: brightness(1.12) !important;
   transform: translateY(-1px) !important;
 }
-.action-btn:active { transform: translateY(0) !important; }
+.action-btn:active {
+  transform: translateY(0) !important;
+}
 
 /* ── Toggle-all link ────────────────────────────────── */
-.toggle-all { transition: color 0.15s ease !important; }
-.toggle-all:hover { color: #60a5fa !important; }
+.toggle-all {
+  transition: color 0.15s ease !important;
+}
+.toggle-all:hover {
+  color: #60a5fa !important;
+}
 
 /* ── Trim buttons ───────────────────────────────────── */
-.trim-btn { transition: all 0.15s ease !important; }
-.trim-btn:hover { filter: brightness(1.15) !important; }
+.trim-btn {
+  transition: all 0.15s ease !important;
+}
+.trim-btn:hover {
+  filter: brightness(1.15) !important;
+}
 
 /* ── Floating button (Save Frame) ───────────────────── */
 .floating-btn {

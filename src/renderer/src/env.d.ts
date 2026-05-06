@@ -13,6 +13,8 @@ export interface MediaSettings {
   audioQuality?: number
   audioBitrate?: string
   wavBitDepth?: '16' | '24'
+  customOutputPath?: string
+  outputFolder?: string
   [key: string]: string | number | boolean | undefined
 }
 
@@ -51,7 +53,11 @@ export interface IElectronAPI {
     customOutputPath?: string
   ) => Promise<string>
   listPresets: () => Promise<Preset[]>
-  savePreset: (preset: { id?: string; name: string; settings: AdvancedSettingsPayload }) => Promise<Preset[]>
+  savePreset: (preset: {
+    id?: string
+    name: string
+    settings: AdvancedSettingsPayload
+  }) => Promise<Preset[]>
   deletePreset: (id: string) => Promise<Preset[]>
   renamePreset: (id: string, name: string) => Promise<Preset[]>
 }

@@ -121,29 +121,28 @@ export function MediaPreview({
         }))
       }
     })
+    ;(async () => {
+      try {
+        const result = await window.api.ensurePlayable(file)
+        if (cancelled) return
 
-      ; (async () => {
-        try {
-          const result = await window.api.ensurePlayable(file)
-          if (cancelled) return
-
-          if (result.needsProxy) {
-            // Use the media:// custom protocol to load the proxy from disk
-            const normalized = result.proxyPath.replace(/\\/g, '/')
-            setPreviewUrl(`media:///${normalized}`)
-          } else {
-            setPreviewUrl(objectUrl)
-          }
-        } catch (err) {
-          console.error('ensurePlayable failed, falling back to direct preview:', err)
-          if (!cancelled) setPreviewUrl(objectUrl)
-        } finally {
-          if (!cancelled) {
-            setIsLoading(false)
-            setProxyState(null)
-          }
+        if (result.needsProxy) {
+          // Use the media:// custom protocol to load the proxy from disk
+          const normalized = result.proxyPath.replace(/\\/g, '/')
+          setPreviewUrl(`media:///${normalized}`)
+        } else {
+          setPreviewUrl(objectUrl)
         }
-      })()
+      } catch (err) {
+        console.error('ensurePlayable failed, falling back to direct preview:', err)
+        if (!cancelled) setPreviewUrl(objectUrl)
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+          setProxyState(null)
+        }
+      }
+    })()
 
     return () => {
       cancelled = true
@@ -276,10 +275,39 @@ export function MediaPreview({
             <p style={{ margin: 0, fontWeight: 600, fontSize: '0.9rem', color: '#ccc' }}>
               Generating preview…
             </p>
-            <p style={{ margin: 0, fontSize: '0.78rem', color: '#555', maxWidth: '380px', textAlign: 'center', lineHeight: 1.6 }}>
-              Building H.264 proxy for <code style={{ color: '#999', background: '#1a1a1a', padding: '0 4px', borderRadius: '3px' }}>{proxyState!.codec}</code> — export uses the original.
+            <p
+              style={{
+                margin: 0,
+                fontSize: '0.78rem',
+                color: '#555',
+                maxWidth: '380px',
+                textAlign: 'center',
+                lineHeight: 1.6
+              }}
+            >
+              Building H.264 proxy for{' '}
+              <code
+                style={{
+                  color: '#999',
+                  background: '#1a1a1a',
+                  padding: '0 4px',
+                  borderRadius: '3px'
+                }}
+              >
+                {proxyState!.codec}
+              </code>{' '}
+              — export uses the original.
             </p>
-            <div style={{ width: '220px', height: '3px', marginTop: '4px', backgroundColor: '#1e1e1e', borderRadius: '4px', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: '220px',
+                height: '3px',
+                marginTop: '4px',
+                backgroundColor: '#1e1e1e',
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}
+            >
               <div
                 style={{
                   width: `${proxyState!.progress}%`,
@@ -290,7 +318,14 @@ export function MediaPreview({
                 }}
               />
             </div>
-            <p style={{ margin: 0, fontSize: '0.72rem', color: '#555', fontVariantNumeric: 'tabular-nums' }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: '0.72rem',
+                color: '#555',
+                fontVariantNumeric: 'tabular-nums'
+              }}
+            >
               {proxyState!.progress}%
             </p>
           </>
@@ -362,14 +397,51 @@ export function MediaPreview({
           className="trim-btn"
           onClick={() => onSetStart?.(formatTime(currentTime))}
           title="Set in-point at playhead (I)"
-          style={{ ...styles.trimButton, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px', padding: '7px 10px', flex: 1 }}
+          style={{
+            ...styles.trimButton,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: '3px',
+            padding: '7px 10px',
+            flex: 1
+          }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="4" y1="4" x2="4" y2="20"/><polyline points="4 12 14 6 14 18 4 12"/></svg>
-            <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>Mark In</span>
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
+              <line x1="4" y1="4" x2="4" y2="20" />
+              <polyline points="4 12 14 6 14 18 4 12" />
+            </svg>
+            <span
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase' as const
+              }}
+            >
+              Mark In
+            </span>
             <span style={{ fontSize: '0.65rem', opacity: 0.5, marginLeft: 'auto' }}>I</span>
           </div>
-          <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#60a5fa', fontVariantNumeric: 'tabular-nums' }}>{formatTime(startSec)}</span>
+          <span
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '0.78rem',
+              color: '#60a5fa',
+              fontVariantNumeric: 'tabular-nums'
+            }}
+          >
+            {formatTime(startSec)}
+          </span>
         </button>
 
         {/* Mark Out */}
@@ -377,14 +449,56 @@ export function MediaPreview({
           className="trim-btn"
           onClick={() => onSetEnd?.(formatTime(currentTime))}
           title="Set out-point at playhead (O)"
-          style={{ ...styles.trimButton, backgroundColor: '#1a1a1a', borderColor: '#2a2a2a', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px', padding: '7px 10px', flex: 1 }}
+          style={{
+            ...styles.trimButton,
+            backgroundColor: '#1a1a1a',
+            borderColor: '#2a2a2a',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: '3px',
+            padding: '7px 10px',
+            flex: 1
+          }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', width: '100%' }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round"><line x1="20" y1="4" x2="20" y2="20"/><polyline points="20 12 10 6 10 18 20 12"/></svg>
-            <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: '#f87171' }}>Mark Out</span>
-            <span style={{ fontSize: '0.65rem', opacity: 0.5, marginLeft: 'auto', color: '#888' }}>O</span>
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#f87171"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
+              <line x1="20" y1="4" x2="20" y2="20" />
+              <polyline points="20 12 10 6 10 18 20 12" />
+            </svg>
+            <span
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase' as const,
+                color: '#f87171'
+              }}
+            >
+              Mark Out
+            </span>
+            <span style={{ fontSize: '0.65rem', opacity: 0.5, marginLeft: 'auto', color: '#888' }}>
+              O
+            </span>
           </div>
-          <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#f87171', fontVariantNumeric: 'tabular-nums' }}>{formatTime(endSec)}</span>
+          <span
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '0.78rem',
+              color: '#f87171',
+              fontVariantNumeric: 'tabular-nums'
+            }}
+          >
+            {formatTime(endSec)}
+          </span>
         </button>
 
         {/* Divider */}
@@ -395,10 +509,32 @@ export function MediaPreview({
           className="trim-btn"
           onClick={playTrim}
           title="Play trim region (P)"
-          style={{ ...styles.trimButton, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '7px 12px', backgroundColor: '#1a1a1a', borderColor: '#2a2a2a', color: '#ccc' }}
+          style={{
+            ...styles.trimButton,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            padding: '7px 12px',
+            backgroundColor: '#1a1a1a',
+            borderColor: '#2a2a2a',
+            color: '#ccc'
+          }}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>Play</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase' as const
+            }}
+          >
+            Play
+          </span>
         </button>
 
         {/* Loop */}
@@ -406,30 +542,96 @@ export function MediaPreview({
           className="trim-btn"
           onClick={() => setLoopTrim((v) => !v)}
           title="Loop the trim region (L)"
-          style={{ ...styles.trimButton, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '7px 12px',
+          style={{
+            ...styles.trimButton,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            padding: '7px 12px',
             backgroundColor: loopTrim ? 'rgba(16,185,129,0.1)' : '#1a1a1a',
             borderColor: loopTrim ? 'rgba(16,185,129,0.35)' : '#2a2a2a',
             color: loopTrim ? '#10b981' : '#555'
           }}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>Loop</span>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="17 1 21 5 17 9" />
+            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+            <polyline points="7 23 3 19 7 15" />
+            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+          </svg>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase' as const
+            }}
+          >
+            Loop
+          </span>
         </button>
       </div>
 
       {/* Timecode + duration row */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 2px' }}>
-        <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: '#555', fontVariantNumeric: 'tabular-nums' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '0 2px'
+        }}
+      >
+        <span
+          style={{
+            fontFamily: 'monospace',
+            fontSize: '0.72rem',
+            color: '#555',
+            fontVariantNumeric: 'tabular-nums'
+          }}
+        >
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ fontSize: '0.65rem', color: '#444', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Clip</span>
-          <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: '#10b981', fontVariantNumeric: 'tabular-nums' }}>{formatTime(trimDuration)}</span>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              color: '#444',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase'
+            }}
+          >
+            Clip
+          </span>
+          <span
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '0.72rem',
+              color: '#10b981',
+              fontVariantNumeric: 'tabular-nums'
+            }}
+          >
+            {formatTime(trimDuration)}
+          </span>
         </div>
       </div>
 
-      <p style={{ fontSize: '0.65rem', color: '#333', margin: '2px 0 0 0', letterSpacing: '0.01em' }}>
-        <b style={{ color: '#4a4a4a' }}>I/O</b> mark in/out · <b style={{ color: '#4a4a4a' }}>P</b> play · <b style={{ color: '#4a4a4a' }}>L</b> loop · <b style={{ color: '#4a4a4a' }}>← →</b> seek · <b style={{ color: '#4a4a4a' }}>Shift</b> +1s
+      <p
+        style={{ fontSize: '0.65rem', color: '#333', margin: '2px 0 0 0', letterSpacing: '0.01em' }}
+      >
+        <b style={{ color: '#4a4a4a' }}>I/O</b> mark in/out · <b style={{ color: '#4a4a4a' }}>P</b>{' '}
+        play · <b style={{ color: '#4a4a4a' }}>L</b> loop · <b style={{ color: '#4a4a4a' }}>← →</b>{' '}
+        seek · <b style={{ color: '#4a4a4a' }}>Shift</b> +1s
       </p>
     </div>
   ) : null
@@ -439,25 +641,34 @@ export function MediaPreview({
 
     const toggleVideoPlay = (): void => {
       if (!mediaRef.current) return
-      if (mediaRef.current.paused) { mediaRef.current.play(); setIsPlaying(true) }
-      else { mediaRef.current.pause(); setIsPlaying(false) }
+      if (mediaRef.current.paused) {
+        mediaRef.current.play()
+        setIsPlaying(true)
+      } else {
+        mediaRef.current.pause()
+        setIsPlaying(false)
+      }
     }
 
     const handleVideoSeek = (e: React.MouseEvent<HTMLDivElement>): void => {
       if (!mediaRef.current || !duration) return
       const rect = e.currentTarget.getBoundingClientRect()
-      mediaRef.current.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * duration
+      mediaRef.current.currentTime =
+        Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * duration
     }
 
     const handleVideoVolume = (e: React.ChangeEvent<HTMLInputElement>): void => {
       const v = parseFloat(e.target.value)
-      setVolume(v); setIsMuted(v === 0)
+      setVolume(v)
+      setIsMuted(v === 0)
       if (mediaRef.current) mediaRef.current.volume = v
     }
 
     const toggleVideoMute = (): void => {
       if (!mediaRef.current) return
-      const next = !isMuted; setIsMuted(next); mediaRef.current.muted = next
+      const next = !isMuted
+      setIsMuted(next)
+      mediaRef.current.muted = next
     }
 
     return (
@@ -473,81 +684,246 @@ export function MediaPreview({
           />
         )}
         {saveFrameToast && (
-          <div className="toast-animated" style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(20,20,20,0.95)', color: '#e8e8e8', padding: '11px 18px', borderRadius: '10px', border: '1px solid rgba(59,130,246,0.35)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 1001, maxWidth: '70%', fontSize: '0.85rem', backdropFilter: 'blur(12px)' }}>
+          <div
+            className="toast-animated"
+            style={{
+              position: 'fixed',
+              bottom: '24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: 'rgba(20,20,20,0.95)',
+              color: '#e8e8e8',
+              padding: '11px 18px',
+              borderRadius: '10px',
+              border: '1px solid rgba(59,130,246,0.35)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+              zIndex: 1001,
+              maxWidth: '70%',
+              fontSize: '0.85rem',
+              backdropFilter: 'blur(12px)'
+            }}
+          >
             {saveFrameToast}
           </div>
         )}
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
-        {/* Video element — no native controls */}
-        <video
-          ref={(el) => { mediaRef.current = el }}
-          src={previewUrl}
-          style={styles.media}
-          onTimeUpdate={() => { handleTimeUpdate(); if (mediaRef.current) setIsPlaying(!mediaRef.current.paused) }}
-          onSeeked={syncTime}
-          onLoadedMetadata={handleLoadedMetadata}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => setIsPlaying(false)}
-          onClick={toggleVideoPlay}
-        />
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0'
+          }}
+        >
+          {/* Video element — no native controls */}
+          <video
+            ref={(el) => {
+              mediaRef.current = el
+            }}
+            src={previewUrl}
+            style={styles.media}
+            onTimeUpdate={() => {
+              handleTimeUpdate()
+              if (mediaRef.current) setIsPlaying(!mediaRef.current.paused)
+            }}
+            onSeeked={syncTime}
+            onLoadedMetadata={handleLoadedMetadata}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => setIsPlaying(false)}
+            onClick={toggleVideoPlay}
+          />
 
-        {/* Custom controls bar */}
-        <div style={{ width: '100%', maxWidth: styles.media.maxWidth, marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {/* Seek bar */}
+          {/* Custom controls bar */}
           <div
-            onClick={handleVideoSeek}
-            style={{ width: '100%', height: '3px', backgroundColor: '#1e1e1e', borderRadius: '4px', cursor: 'pointer', position: 'relative' }}
+            style={{
+              width: '100%',
+              maxWidth: styles.media.maxWidth,
+              marginTop: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}
           >
-            <div style={{ width: `${videoProgress}%`, height: '100%', backgroundColor: '#3b82f6', borderRadius: '4px', transition: 'width 0.1s linear', position: 'relative' }}>
-              <div style={{ position: 'absolute', right: '-5px', top: '-3px', width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#fff' }} />
+            {/* Seek bar */}
+            <div
+              onClick={handleVideoSeek}
+              style={{
+                width: '100%',
+                height: '3px',
+                backgroundColor: '#1e1e1e',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                position: 'relative'
+              }}
+            >
+              <div
+                style={{
+                  width: `${videoProgress}%`,
+                  height: '100%',
+                  backgroundColor: '#3b82f6',
+                  borderRadius: '4px',
+                  transition: 'width 0.1s linear',
+                  position: 'relative'
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: '-5px',
+                    top: '-3px',
+                    width: '9px',
+                    height: '9px',
+                    borderRadius: '50%',
+                    backgroundColor: '#fff'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Controls row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* Play/Pause */}
+              <button
+                onClick={toggleVideoPlay}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  color: '#ccc',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexShrink: 0,
+                  transition: 'color 0.15s ease'
+                }}
+              >
+                {isPlaying ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    style={{ marginLeft: '1px' }}
+                  >
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Time */}
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  color: '#666',
+                  fontFamily: 'monospace',
+                  fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0
+                }}
+              >
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+
+              <div style={{ flex: 1 }} />
+
+              {/* Volume */}
+              <button
+                onClick={toggleVideoMute}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  color: isMuted ? '#444' : '#666',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexShrink: 0
+                }}
+              >
+                {isMuted || volume === 0 ? (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                ) : volume < 0.5 ? (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  </svg>
+                )}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.02"
+                value={isMuted ? 0 : volume}
+                onChange={handleVideoVolume}
+                style={{ width: '72px', accentColor: '#3b82f6', cursor: 'pointer' }}
+              />
+
+              {/* Save Frame */}
+              <button
+                className="floating-btn"
+                onClick={handleSaveFrame}
+                disabled={isSaving}
+                style={{
+                  ...styles.floatingButton,
+                  position: 'static',
+                  fontSize: '0.72rem',
+                  padding: '5px 10px'
+                }}
+              >
+                {isSaving ? 'Saving…' : 'Save Frame'}
+              </button>
             </div>
           </div>
 
-          {/* Controls row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Play/Pause */}
-            <button onClick={toggleVideoPlay} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: '#ccc', display: 'flex', alignItems: 'center', flexShrink: 0, transition: 'color 0.15s ease' }}>
-              {isPlaying ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: '1px' }}><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              )}
-            </button>
-
-            {/* Time */}
-            <span style={{ fontSize: '0.72rem', color: '#666', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </span>
-
-            <div style={{ flex: 1 }} />
-
-            {/* Volume */}
-            <button onClick={toggleVideoMute} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: isMuted ? '#444' : '#666', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-              {isMuted || volume === 0 ? (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-              ) : volume < 0.5 ? (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-              ) : (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-              )}
-            </button>
-            <input type="range" min="0" max="1" step="0.02" value={isMuted ? 0 : volume} onChange={handleVideoVolume}
-              style={{ width: '72px', accentColor: '#3b82f6', cursor: 'pointer' }} />
-
-            {/* Save Frame */}
-            <button className="floating-btn" onClick={handleSaveFrame} disabled={isSaving} style={{ ...styles.floatingButton, position: 'static', fontSize: '0.72rem', padding: '5px 10px' }}>
-              {isSaving ? 'Saving…' : 'Save Frame'}
-            </button>
-          </div>
+          {trimPanel ?? (
+            <p style={{ fontSize: '0.68rem', color: '#3a3a3a', marginTop: '8px' }}>
+              <b style={{ color: '#555' }}>← →</b> seek · <b style={{ color: '#555' }}>Shift</b> +1s
+              · click video to play/pause
+            </p>
+          )}
         </div>
-
-        {trimPanel ?? (
-          <p style={{ fontSize: '0.68rem', color: '#3a3a3a', marginTop: '8px' }}>
-            <b style={{ color: '#555' }}>← →</b> seek · <b style={{ color: '#555' }}>Shift</b> +1s · click video to play/pause
-          </p>
-        )}
-      </div>
       </>
     )
   }
@@ -593,12 +969,25 @@ export function MediaPreview({
     }
 
     return (
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '14px'
+        }}
+      >
         {/* Hidden native audio element */}
         <audio
-          ref={(el) => { mediaRef.current = el }}
+          ref={(el) => {
+            mediaRef.current = el
+          }}
           src={previewUrl}
-          onTimeUpdate={() => { handleTimeUpdate(); if (mediaRef.current) setIsPlaying(!mediaRef.current.paused) }}
+          onTimeUpdate={() => {
+            handleTimeUpdate()
+            if (mediaRef.current) setIsPlaying(!mediaRef.current.paused)
+          }}
           onSeeked={syncTime}
           onLoadedMetadata={handleLoadedMetadata}
           onPlay={() => setIsPlaying(true)}
@@ -611,29 +1000,102 @@ export function MediaPreview({
         <div style={{ ...styles.audioContainer, width: '100%', maxWidth: '820px' }}>
           {/* File icon + name */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
               </svg>
             </div>
             <div style={{ overflow: 'hidden' }}>
-              <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 500, color: '#e0e0e0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
-              <p style={{ margin: 0, fontSize: '0.72rem', color: '#555', marginTop: '2px' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#e0e0e0',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {file.name}
+              </p>
+              <p style={{ margin: 0, fontSize: '0.72rem', color: '#555', marginTop: '2px' }}>
+                {(file.size / 1024 / 1024).toFixed(2)} MB
+              </p>
             </div>
           </div>
 
           {/* Seek bar */}
           <div
             onClick={handleAudioSeek}
-            style={{ width: '100%', height: '4px', backgroundColor: '#1e1e1e', borderRadius: '4px', cursor: 'pointer', marginBottom: '14px', position: 'relative' }}
+            style={{
+              width: '100%',
+              height: '4px',
+              backgroundColor: '#1e1e1e',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginBottom: '14px',
+              position: 'relative'
+            }}
           >
-            <div style={{ width: `${audioProgress}%`, height: '100%', backgroundColor: '#3b82f6', borderRadius: '4px', transition: 'width 0.1s linear', position: 'relative' }}>
-              <div style={{ position: 'absolute', right: '-5px', top: '-4px', width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#fff' }} />
+            <div
+              style={{
+                width: `${audioProgress}%`,
+                height: '100%',
+                backgroundColor: '#3b82f6',
+                borderRadius: '4px',
+                transition: 'width 0.1s linear',
+                position: 'relative'
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '-5px',
+                  top: '-4px',
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '50%',
+                  backgroundColor: '#fff'
+                }}
+              />
             </div>
           </div>
 
           {/* Time display */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#555', fontVariantNumeric: 'tabular-nums', fontFamily: 'monospace', marginBottom: '16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '0.72rem',
+              color: '#555',
+              fontVariantNumeric: 'tabular-nums',
+              fontFamily: 'monospace',
+              marginBottom: '16px'
+            }}
+          >
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(audioDuration)}</span>
           </div>
@@ -643,26 +1105,95 @@ export function MediaPreview({
             {/* Play / Pause */}
             <button
               onClick={togglePlay}
-              style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#3b82f6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s ease' }}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: '#3b82f6',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                transition: 'all 0.15s ease'
+              }}
             >
               {isPlaying ? (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
               ) : (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" style={{ marginLeft: '2px' }}><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="#fff"
+                  style={{ marginLeft: '2px' }}
+                >
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
               )}
             </button>
 
             {/* Volume icon toggle */}
             <button
               onClick={toggleMute}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: isMuted ? '#444' : '#666', flexShrink: 0, display: 'flex', alignItems: 'center' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                color: isMuted ? '#444' : '#666',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
             >
               {isMuted || volume === 0 ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
+                </svg>
               ) : volume < 0.5 ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
               ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
               )}
             </button>
 
@@ -858,9 +1389,14 @@ function SaveFrameModal({
     <div
       onClick={onClose}
       style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
-        backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1000,
+        backgroundColor: 'rgba(0,0,0,0.55)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         animation: 'fadeIn 0.18s ease'
       }}
     >
@@ -868,23 +1404,61 @@ function SaveFrameModal({
         onClick={(e) => e.stopPropagation()}
         className="done-card"
         style={{
-          width: '100%', maxWidth: '420px',
+          width: '100%',
+          maxWidth: '420px',
           background: 'linear-gradient(145deg, #181818, #1c1c1c)',
-          border: '1px solid #2a2a2a', borderRadius: '14px',
-          padding: '22px 22px 18px', color: '#e0e0e0'
+          border: '1px solid #2a2a2a',
+          borderRadius: '14px',
+          padding: '22px 22px 18px',
+          color: '#e0e0e0'
         }}
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'rgba(59,130,246,0.12)',
+              border: '1px solid rgba(59,130,246,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#60a5fa"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
             </svg>
           </div>
           <div style={{ overflow: 'hidden' }}>
-            <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e8e8e8' }}>Save Frame</h3>
-            <p style={{ margin: '2px 0 0 0', fontSize: '0.72rem', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              <span style={{ fontFamily: 'monospace', color: '#888' }}>{formattedTime}</span> · {fileName}
+            <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e8e8e8' }}>
+              Save Frame
+            </h3>
+            <p
+              style={{
+                margin: '2px 0 0 0',
+                fontSize: '0.72rem',
+                color: '#666',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <span style={{ fontFamily: 'monospace', color: '#888' }}>{formattedTime}</span> ·{' '}
+              {fileName}
             </p>
           </div>
         </div>
@@ -895,21 +1469,54 @@ function SaveFrameModal({
             onClick={onSaveDefault}
             className="action-btn"
             style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
-              padding: '12px 14px', borderRadius: '10px',
-              border: '1px solid #2a2a2a', backgroundColor: '#1a1a1a',
-              cursor: 'pointer', textAlign: 'left' as const, color: '#e0e0e0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 14px',
+              borderRadius: '10px',
+              border: '1px solid #2a2a2a',
+              backgroundColor: '#1a1a1a',
+              cursor: 'pointer',
+              textAlign: 'left' as const,
+              color: '#e0e0e0',
               fontFamily: 'inherit'
             }}
           >
-            <span style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#202020', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <span
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                backgroundColor: '#202020',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#888"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
               </svg>
             </span>
             <span style={{ flex: 1 }}>
-              <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500 }}>Save next to file</span>
-              <span style={{ display: 'block', fontSize: '0.72rem', color: '#666', marginTop: '2px' }}>Auto-named in the source folder</span>
+              <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500 }}>
+                Save next to file
+              </span>
+              <span
+                style={{ display: 'block', fontSize: '0.72rem', color: '#666', marginTop: '2px' }}
+              >
+                Auto-named in the source folder
+              </span>
             </span>
           </button>
 
@@ -917,21 +1524,55 @@ function SaveFrameModal({
             onClick={onSaveCustom}
             className="action-btn"
             style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
-              padding: '12px 14px', borderRadius: '10px',
-              border: '1px solid #2a2a2a', backgroundColor: '#1a1a1a',
-              cursor: 'pointer', textAlign: 'left' as const, color: '#e0e0e0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 14px',
+              borderRadius: '10px',
+              border: '1px solid #2a2a2a',
+              backgroundColor: '#1a1a1a',
+              cursor: 'pointer',
+              textAlign: 'left' as const,
+              color: '#e0e0e0',
               fontFamily: 'inherit'
             }}
           >
-            <span style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#202020', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            <span
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                backgroundColor: '#202020',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#60a5fa"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </span>
             <span style={{ flex: 1 }}>
-              <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500 }}>Choose location…</span>
-              <span style={{ display: 'block', fontSize: '0.72rem', color: '#666', marginTop: '2px' }}>Pick a folder and name</span>
+              <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500 }}>
+                Choose location…
+              </span>
+              <span
+                style={{ display: 'block', fontSize: '0.72rem', color: '#666', marginTop: '2px' }}
+              >
+                Pick a folder and name
+              </span>
             </span>
           </button>
         </div>
@@ -941,13 +1582,24 @@ function SaveFrameModal({
           <button
             onClick={onClose}
             style={{
-              padding: '7px 14px', borderRadius: '7px',
-              backgroundColor: 'transparent', border: '1px solid #2a2a2a',
-              color: '#888', fontSize: '0.8rem', cursor: 'pointer',
-              fontFamily: 'inherit', transition: 'all 0.15s ease'
+              padding: '7px 14px',
+              borderRadius: '7px',
+              backgroundColor: 'transparent',
+              border: '1px solid #2a2a2a',
+              color: '#888',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'all 0.15s ease'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#3a3a3a'; e.currentTarget.style.color = '#bbb' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#2a2a2a'; e.currentTarget.style.color = '#888' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#3a3a3a'
+              e.currentTarget.style.color = '#bbb'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#2a2a2a'
+              e.currentTarget.style.color = '#888'
+            }}
           >
             Cancel
           </button>

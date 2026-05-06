@@ -1,6 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, protocol } from 'electron'
 import { join } from 'path'
-import { electronApp, is } from '@electron-toolkit/utils'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import crypto from 'crypto'
@@ -53,24 +53,8 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      devTools: false // Completely disable DevTools
+      devTools: true
     }
-  })
-
-  // Block F12, Ctrl+Shift+I, etc.
-  mainWindow.webContents.on('before-input-event', (event, input) => {
-    if (
-      input.key === 'F12' ||
-      (input.control && input.shift && input.key.toLowerCase() === 'i') ||
-      (input.meta && input.alt && input.key.toLowerCase() === 'i')
-    ) {
-      event.preventDefault()
-    }
-  })
-
-  // Block "Inspect Element" / Context Menu
-  mainWindow.webContents.on('context-menu', (e) => {
-    e.preventDefault()
   })
 
   mainWindow.on('ready-to-show', () => {
@@ -99,8 +83,8 @@ app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.aldairgonzalez.vmt')
 
   // Block the devtools optimizer which enables F12 by default
-  app.on('browser-window-created', () => {
-    // Removed optimizer.watchWindowShortcuts(window)
+  app.on('browser-window-created', (_, window) => {
+    optimizer.watchWindowShortcuts(window)
   })
 
   // IPC Handlers
@@ -245,7 +229,17 @@ app.whenReady().then(() => {
   }
   let cachedCaps: FFmpegCaps | null = null
 
-  const HARDWARE_HINTS = ['nvenc', 'qsv', 'amf', 'vaapi', 'videotoolbox', 'mediacodec', 'rkmpp', 'omx', 'cuda']
+  const HARDWARE_HINTS = [
+    'nvenc',
+    'qsv',
+    'amf',
+    'vaapi',
+    'videotoolbox',
+    'mediacodec',
+    'rkmpp',
+    'omx',
+    'cuda'
+  ]
 
   const runFfmpeg = (args: string[]): Promise<string> =>
     new Promise((resolve) => {
@@ -367,7 +361,8 @@ app.whenReady().then(() => {
 
   ipcMain.handle('save-preset', async (_event, payload) => {
     const { id, name, settings } = payload as Pick<Preset, 'id' | 'name' | 'settings'>
-    if (!name || typeof name !== 'string' || !name.trim()) throw new Error('Preset name is required')
+    if (!name || typeof name !== 'string' || !name.trim())
+      throw new Error('Preset name is required')
     if (!settings || typeof settings !== 'object') throw new Error('Preset settings are required')
 
     const file = await readPresets()
@@ -523,11 +518,7 @@ app.whenReady().then(() => {
 
   // Run the user's custom ffmpeg pipeline for real and report progress.
   ipcMain.handle('process-advanced', async (event, payload) => {
-    const {
-      filePath,
-      advanced,
-      replaceOriginal
-    } = payload as {
+    const { filePath, advanced, replaceOriginal } = payload as {
       filePath: string
       advanced: AdvancedSettings
       replaceOriginal: boolean
@@ -856,7 +847,14 @@ app.whenReady().then(() => {
           ffmpegArgs.push('-profile:v', profileMap[codec] || '2')
           ffmpegArgs.push('-pix_fmt', codec.includes('4444') ? 'yuva444p10le' : 'yuv422p10le')
         } else if (codec === 'hevc_alpha') {
-          ffmpegArgs.push('-c:v', 'libx265', '-x265-params', 'lossless=1', '-pix_fmt', 'yuva444p10le')
+          ffmpegArgs.push(
+            '-c:v',
+            'libx265',
+            '-x265-params',
+            'lossless=1',
+            '-pix_fmt',
+            'yuva444p10le'
+          )
         } else if (codec === 'vp9_alpha') {
           ffmpegArgs.push('-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p')
         } else if (codec === 'hap_alpha') {
@@ -992,8 +990,9 @@ app.whenReady().then(() => {
     }
 
     // 2. Build the final output path
-    let outputPath = customOutputPath || path.join(parsedPath.dir, `${parsedPath.name}${suffix}${outputExt}`)
-    
+    let outputPath =
+      customOutputPath || path.join(parsedPath.dir, `${parsedPath.name}${suffix}${outputExt}`)
+
     // If outputFolder is provided (used for batching), we use that directory but keep the original filename
     if (outputFolder) {
       const targetDir = path.extname(outputFolder) ? path.dirname(outputFolder) : outputFolder
@@ -1001,11 +1000,14 @@ app.whenReady().then(() => {
     }
 
     // If the custom path doesn't have the right extension, we append it unless it already has one
-    if ((customOutputPath || outputFolder) && !outputPath.toLowerCase().endsWith(outputExt.toLowerCase())) {
-       // Only append if it's a known extension mismatch or missing
-       if (!path.extname(outputPath)) {
-          outputPath += outputExt
-       }
+    if (
+      (customOutputPath || outputFolder) &&
+      !outputPath.toLowerCase().endsWith(outputExt.toLowerCase())
+    ) {
+      // Only append if it's a known extension mismatch or missing
+      if (!path.extname(outputPath)) {
+        outputPath += outputExt
+      }
     }
 
     // 3. SPECIAL CASE: GIF (using gifski)
@@ -1117,7 +1119,8 @@ app.whenReady().then(() => {
     const { format = 'png', width, height, crf = 80 } = settings || {}
 
     const outputExt = `.${format}`
-    let outputPath = customOutputPath || path.join(parsedPath.dir, `${parsedPath.name}_converted${outputExt}`)
+    let outputPath =
+      customOutputPath || path.join(parsedPath.dir, `${parsedPath.name}_converted${outputExt}`)
 
     if (outputFolder) {
       const targetDir = path.extname(outputFolder) ? path.dirname(outputFolder) : outputFolder
