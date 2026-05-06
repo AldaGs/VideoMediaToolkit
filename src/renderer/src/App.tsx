@@ -1431,66 +1431,71 @@ function App(): React.JSX.Element {
                     </div>
 
                     {/* Compression Method (Hidden for ProRes) */}
-                    {!codec.toLowerCase().includes('prores') && !codec.toLowerCase().includes('hap') && codec !== 'copy' && (
-                      <div>
-                        <label style={styles.label}>Compression Method</label>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                          <button
-                            className="mini-btn"
-                            onClick={() => setCompressionMethod('crf')}
-                            style={{
-                              ...styles.miniButton,
-                              backgroundColor: compressionMethod === 'crf' ? '#2563eb' : '#1e1e1e',
-                              color: compressionMethod === 'crf' ? '#fff' : '#888',
-                              borderColor: compressionMethod === 'crf' ? '#3b82f6' : '#2a2a2a'
-                            }}
-                          >
-                            CRF (Quality)
-                          </button>
-                          <button
-                            className="mini-btn"
-                            onClick={() => setCompressionMethod('bitrate')}
-                            style={{
-                              ...styles.miniButton,
-                              backgroundColor:
-                                compressionMethod === 'bitrate' ? '#2563eb' : '#1e1e1e',
-                              color: compressionMethod === 'bitrate' ? '#fff' : '#888',
-                              borderColor: compressionMethod === 'bitrate' ? '#3b82f6' : '#2a2a2a'
-                            }}
-                          >
-                            Bitrate
-                          </button>
+                    {!codec.toLowerCase().includes('prores') &&
+                      !codec.toLowerCase().includes('hap') &&
+                      codec !== 'copy' && (
+                        <div>
+                          <label style={styles.label}>Compression Method</label>
+                          <div style={{ display: 'flex', gap: '10px' }}>
+                            <button
+                              className="mini-btn"
+                              onClick={() => setCompressionMethod('crf')}
+                              style={{
+                                ...styles.miniButton,
+                                backgroundColor:
+                                  compressionMethod === 'crf' ? '#2563eb' : '#1e1e1e',
+                                color: compressionMethod === 'crf' ? '#fff' : '#888',
+                                borderColor: compressionMethod === 'crf' ? '#3b82f6' : '#2a2a2a'
+                              }}
+                            >
+                              CRF (Quality)
+                            </button>
+                            <button
+                              className="mini-btn"
+                              onClick={() => setCompressionMethod('bitrate')}
+                              style={{
+                                ...styles.miniButton,
+                                backgroundColor:
+                                  compressionMethod === 'bitrate' ? '#2563eb' : '#1e1e1e',
+                                color: compressionMethod === 'bitrate' ? '#fff' : '#888',
+                                borderColor: compressionMethod === 'bitrate' ? '#3b82f6' : '#2a2a2a'
+                              }}
+                            >
+                              Bitrate
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* Compression Value */}
-                    {!codec.toLowerCase().includes('prores') && !codec.toLowerCase().includes('hap') && codec !== 'copy' && (
-                      <div>
-                        <label style={styles.label}>
-                          {compressionMethod === 'crf'
-                            ? 'Quality (CRF: 0-51)'
-                            : 'Bitrate (e.g. 2M, 500k)'}
-                        </label>
-                        {compressionMethod === 'crf' ? (
-                          <input
-                            className="styled-input"
-                            type="number"
-                            value={crf}
-                            onChange={(e) => setCrf(parseInt(e.target.value))}
-                            style={styles.input}
-                          />
-                        ) : (
-                          <input
-                            className="styled-input"
-                            type="text"
-                            value={bitrate}
-                            onChange={(e) => setBitrate(e.target.value)}
-                            style={styles.input}
-                          />
-                        )}
-                      </div>
-                    )}
+                    {!codec.toLowerCase().includes('prores') &&
+                      !codec.toLowerCase().includes('hap') &&
+                      codec !== 'copy' && (
+                        <div>
+                          <label style={styles.label}>
+                            {compressionMethod === 'crf'
+                              ? 'Quality (CRF: 0-51)'
+                              : 'Bitrate (e.g. 2M, 500k)'}
+                          </label>
+                          {compressionMethod === 'crf' ? (
+                            <input
+                              className="styled-input"
+                              type="number"
+                              value={crf}
+                              onChange={(e) => setCrf(parseInt(e.target.value))}
+                              style={styles.input}
+                            />
+                          ) : (
+                            <input
+                              className="styled-input"
+                              type="text"
+                              value={bitrate}
+                              onChange={(e) => setBitrate(e.target.value)}
+                              style={styles.input}
+                            />
+                          )}
+                        </div>
+                      )}
 
                     {/* Resize */}
                     <div>
