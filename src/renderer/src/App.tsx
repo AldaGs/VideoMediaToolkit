@@ -197,13 +197,21 @@ function App(): React.JSX.Element {
 
       if (isImage && selectedTool !== 'image_convert') {
         setSelectedTool('image_convert')
+        // Auto-switch to PNG if we were in a video format
+        if (['mp4', 'mkv', 'mov', 'avi', 'webm'].includes(outputFormat)) {
+          setOutputFormat('png')
+        }
       } else if (isVideo && selectedTool === 'image_convert') {
         setSelectedTool('compress')
+        // Auto-switch back to MP4 if we were in an image format
+        if (['png', 'jpg', 'jpeg', 'webp', 'bmp', 'tga', 'tiff'].includes(outputFormat)) {
+          setOutputFormat('mp4')
+        }
       } else if (isAudio && selectedTool !== 'extract_audio' && selectedTool !== 'trim_audio') {
         setSelectedTool('extract_audio')
       }
     }
-  }, [activeIndex, queue, selectedTool])
+  }, [activeIndex, queue, selectedTool, outputFormat])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files) addFilesToQueue(Array.from(e.target.files))

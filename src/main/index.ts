@@ -527,7 +527,16 @@ app.whenReady().then(() => {
 
     const ffmpegPath = getToolPath('ffmpeg')
     const parsedPath = path.parse(filePath)
-    const outputExt = `.${(advanced.outputExt || 'mp4').replace(/^\.+/, '')}`
+    let outputExt = `.${(advanced.outputExt || 'mp4').replace(/^\.+/, '')}`
+
+    // Robustness: If the input is an image, ensure the output extension is also an image format
+    const isInputImage = ['.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tga', '.tiff', '.gif'].includes(
+      parsedPath.ext.toLowerCase()
+    )
+    const videoFormats = ['.mp4', '.mkv', '.mov', '.avi', '.webm']
+    if (isInputImage && videoFormats.includes(outputExt.toLowerCase())) {
+      outputExt = parsedPath.ext // Fallback to original image extension
+    }
 
     let outputPath: string
     if (customOutputPath) {
@@ -831,6 +840,22 @@ app.whenReady().then(() => {
         } = settings || {}
 
         outputExt = `.${format}`
+
+        // Robustness: if input is an image, don't allow video extensions
+        const isInputImage = [
+          '.png',
+          '.jpg',
+          '.jpeg',
+          '.webp',
+          '.bmp',
+          '.tga',
+          '.tiff',
+          '.gif'
+        ].includes(parsedPath.ext.toLowerCase())
+        const videoFormats = ['.mp4', '.mkv', '.mov', '.avi', '.webm']
+        if (isInputImage && videoFormats.includes(outputExt.toLowerCase())) {
+          outputExt = parsedPath.ext
+        }
         ffmpegArgs = ['-i', filePath]
 
         // 1. Video Codec
@@ -1116,7 +1141,14 @@ app.whenReady().then(() => {
     const outputFolder: string | undefined = payload.outputFolder ?? settings?.outputFolder
     const ffmpegPath = getToolPath('ffmpeg')
     const parsedPath = path.parse(filePath)
-    const { format = 'png', width, height, crf = 80 } = settings || {}
+    let format = settings?.format || 'png'
+    const { width, height, crf = 80 } = settings || {}
+
+    // Safety check: if they somehow requested a video format for an image, fallback to png
+    const videoFormats = ['mp4', 'mkv', 'mov', 'avi', 'webm']
+    if (videoFormats.includes(format.toLowerCase())) {
+      format = 'png'
+    }
 
     const outputExt = `.${format}`
     let outputPath =

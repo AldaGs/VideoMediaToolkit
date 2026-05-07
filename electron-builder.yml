@@ -16,11 +16,20 @@ extraResources:
       - '**/*'
 win:
   executableName: VMT
+  target:
+    - target: nsis
+    - target: msi
 nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+msi:
+  artifactName: ${name}-${version}.${ext}
+  shortcutName: ${productName}
+  oneClick: false
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
