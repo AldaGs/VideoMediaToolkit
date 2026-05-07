@@ -59,6 +59,12 @@ function App(): React.JSX.Element {
   const [audioQuality, setAudioQuality] = useState<number>(2) // mp3 VBR 0-9
   const [audioBitrate, setAudioBitrate] = useState<string>('192k')
   const [wavBitDepth, setWavBitDepth] = useState<'16' | '24'>('16')
+
+  // Replace Audio settings
+  const [replaceAudioPath, setReplaceAudioPath] = useState<string | null>(null)
+  const [replaceAudioCodec, setReplaceAudioCodec] = useState<'aac' | 'libmp3lame' | 'copy'>('aac')
+  const [replaceAudioBitrate, setReplaceAudioBitrate] = useState<string>('192k')
+  const [replaceAudioShortest, setReplaceAudioShortest] = useState<boolean>(true)
   const [leftWidth, setLeftWidth] = useState(280) // Default Queue width
   const [rightWidth, setRightWidth] = useState(320) // Default Settings width
   const [isDragging, setIsDragging] = useState<'left' | 'right' | null>(null)
@@ -417,8 +423,11 @@ function App(): React.JSX.Element {
             audioFormat,
             audioMode,
             audioQuality,
-            audioBitrate,
+            audioBitrate: selectedTool === 'replace_audio' ? replaceAudioBitrate : audioBitrate,
             wavBitDepth,
+            audioPath: replaceAudioPath || undefined,
+            audioCodec: selectedTool === 'replace_audio' ? replaceAudioCodec : undefined,
+            shortest: selectedTool === 'replace_audio' ? replaceAudioShortest : undefined,
             customOutputPath: itemCustomPath,
             outputFolder: undefined
           })
@@ -1298,6 +1307,15 @@ function App(): React.JSX.Element {
                     Remove Audio
                   </option>
                   <option
+                    value="replace_audio"
+                    disabled={
+                      activeItem?.file.type.startsWith('image/') ||
+                      activeItem?.file.type.startsWith('audio/')
+                    }
+                  >
+                    Replace Audio
+                  </option>
+                  <option
                     value="gif"
                     disabled={
                       activeItem?.file.type.startsWith('image/') ||
@@ -1978,6 +1996,127 @@ function App(): React.JSX.Element {
                         </button>
                       </div>
                     </div>
+                  </div>
+                ) : selectedTool === 'replace_audio' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <label style={styles.label}>Replacement Audio</label>
+                      <button
+                        className="mini-btn"
+                        onClick={async () => {
+                          const p = await window.api.selectAudioFile()
+                          if (p) setReplaceAudioPath(p)
+                        }}
+                        style={{ ...styles.miniButton, width: '100%', padding: '8px' }}
+                      >
+                        {replaceAudioPath ? 'Change Audio File…' : 'Select Audio File…'}
+                      </button>
+                      {replaceAudioPath && (
+                        <div
+                          style={{
+                            marginTop: '6px',
+                            padding: '6px 8px',
+                            backgroundColor: '#1e1e1e',
+                            border: '1px solid #2a2a2a',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            color: '#bbb',
+                            wordBreak: 'break-all',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          <span style={{ flex: 1 }}>{replaceAudioPath}</span>
+                          <button
+                            onClick={() => setReplaceAudioPath(null)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#888',
+                              cursor: 'pointer'
+                            }}
+                            title="Clear"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label style={styles.label}>Audio Codec</label>
+                      <select
+                        className="styled-select"
+                        value={replaceAudioCodec}
+                        onChange={(e) =>
+                          setReplaceAudioCodec(
+                            e.target.value as 'aac' | 'libmp3lame' | 'copy'
+                          )
+                        }
+                        style={styles.select}
+                      >
+                        <option value="aac">AAC (re-encode)</option>
+                        <option value="libmp3lame">MP3 (re-encode)</option>
+                        <option value="copy">Copy (no re-encode)</option>
+                      </select>
+                    </div>
+
+                    {replaceAudioCodec !== 'copy' && (
+                      <div>
+                        <label style={styles.label}>Audio Bitrate</label>
+                        <select
+                          className="styled-select"
+                          value={replaceAudioBitrate}
+                          onChange={(e) => setReplaceAudioBitrate(e.target.value)}
+                          style={styles.select}
+                        >
+                          <option value="96k">96 kbps</option>
+                          <option value="128k">128 kbps</option>
+                          <option value="160k">160 kbps</option>
+                          <option value="192k">192 kbps</option>
+                          <option value="256k">256 kbps</option>
+                          <option value="320k">320 kbps</option>
+                        </select>
+                      </div>
+                    )}
+
+                    <div>
+                      <label style={styles.label}>Output Format</label>
+                      <select
+                        className="styled-select"
+                        value={outputFormat}
+                        onChange={(e) => setOutputFormat(e.target.value)}
+                        style={styles.select}
+                      >
+                        <option value="mp4">MP4</option>
+                        <option value="mkv">MKV</option>
+                        <option value="mov">MOV</option>
+                        <option value="webm">WebM</option>
+                      </select>
+                    </div>
+
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        color: '#bbb'
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={replaceAudioShortest}
+                        onChange={(e) => setReplaceAudioShortest(e.target.checked)}
+                      />
+                      Trim to shortest stream
+                    </label>
+                    <p style={{ fontSize: '0.72rem', color: '#777', margin: 0 }}>
+                      Video stream is copied without re-encoding. The original audio is replaced
+                      with the selected file.
+                    </p>
                   </div>
                 ) : (
                   <p style={{ color: '#888', margin: 0, fontSize: '0.9rem', textAlign: 'center' }}>

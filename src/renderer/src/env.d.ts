@@ -41,6 +41,7 @@ export interface IElectronAPI {
   removeProxyListeners: () => void
   cancelProxy: (file: File) => Promise<boolean>
   selectSavePath: (defaultPath: string) => Promise<string | null>
+  selectAudioFile: () => Promise<string | null>
   getFfmpegCaps: () => Promise<FFmpegCaps>
   validateAdvanced: (
     file: File,

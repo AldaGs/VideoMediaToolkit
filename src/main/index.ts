@@ -734,6 +734,23 @@ app.whenReady().then(() => {
     return { canceled: false as const, filePath: result.filePath }
   })
 
+  ipcMain.handle('select-audio-file', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender) ?? undefined
+    const result = await dialog.showOpenDialog(win!, {
+      title: 'Select Replacement Audio',
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'Audio',
+          extensions: ['mp3', 'wav', 'aac', 'm4a', 'flac', 'ogg', 'opus', 'wma']
+        },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    })
+    if (result.canceled || !result.filePaths[0]) return null
+    return result.filePaths[0]
+  })
+
   ipcMain.handle('select-save-path', async (event, { defaultPath }: { defaultPath: string }) => {
     const win = BrowserWindow.fromWebContents(event.sender) ?? undefined
 
@@ -954,6 +971,40 @@ app.whenReady().then(() => {
         // Copy video stream directly, drop audio (-an)
         ffmpegArgs = ['-i', filePath, '-c:v', 'copy', '-an']
         break
+      case 'replace_audio': {
+        const {
+          audioPath,
+          audioCodec = 'aac',
+          audioBitrate = '192k',
+          format,
+          shortest = true
+        } = settings || {}
+        if (!audioPath || typeof audioPath !== 'string') {
+          throw new Error('No replacement audio file selected')
+        }
+        if (format) outputExt = `.${format}`
+        suffix = '_replaced'
+        ffmpegArgs = [
+          '-i',
+          filePath,
+          '-i',
+          audioPath,
+          '-map',
+          '0:v:0',
+          '-map',
+          '1:a:0',
+          '-c:v',
+          'copy'
+        ]
+        if (audioCodec === 'copy') {
+          ffmpegArgs.push('-c:a', 'copy')
+        } else {
+          ffmpegArgs.push('-c:a', audioCodec)
+          if (audioBitrate) ffmpegArgs.push('-b:a', String(audioBitrate))
+        }
+        if (shortest) ffmpegArgs.push('-shortest')
+        break
+      }
       case 'trim': {
         const {
           startTime,

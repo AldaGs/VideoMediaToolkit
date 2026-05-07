@@ -50,6 +50,8 @@ const api = {
     ipcRenderer.invoke('export-file', { sourcePath }) as Promise<
       { canceled: true } | { canceled: false; filePath: string }
     >,
+  selectAudioFile: () =>
+    ipcRenderer.invoke('select-audio-file') as Promise<string | null>,
   selectSavePath: (defaultPath: string) =>
     ipcRenderer.invoke('select-save-path', { defaultPath }) as Promise<string | null>,
   getFfmpegCaps: () => ipcRenderer.invoke('get-ffmpeg-caps'),
